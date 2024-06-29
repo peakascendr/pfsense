@@ -1,8 +1,8 @@
 # pfsense
 
-freebsd arp behavior is such that arp state table entry ttl's are refreshed when L3 packets are received. Therefore arp requests are only sent if no communication occurs with a the respective IP within the arp entry expiration period.
+freebsd arp behavior is such that arp state table entry ttls are refreshed by successfully communicating with a respective IPv4. Therefore arp requests are only sent if no communication occurs with a respective IP and the arp table entry has expired.
 
-Some ISP's reset arp tables on their router/gateways frequently or when connectivity is unstable. This feature/behavior combination creates extended outtages where pfsense detects gateway down (not responding to ICMP requests) and ISP will not respond until an arp request is received. The condition is not resolved until the arp entry expires in pfsense and an arp boradcast for the gateway IP is sent. 
+Some ISP's appear to reset the arp tables on their router/gateways frequently or when connectivity is unstable. This feature/behavior combination creates extended outages where pfsense detects gateway down (not responding to ICMP requests) but still sending correctly and the ISP will not respond until an arp request is received. The outage condition is not resolved until the arp entry expires in pfsense and an arp boradcast for the gateway IP is sent. One way to address the conditon would be to lower the arp expiration using system tunable `net.link.ether.inet.max_age` where the default is 1200 seconds, however that could increase arp traffic considerably. 
 
 To address this condition I've created script and related cron entry that leverages arping to send arp requests to the gateway on a regular basis
 
